@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài viết đã thích - TechPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="tp-header" id="header">
+        <div class="tp-container header-inner">
+            <a href="index.html" class="logo">Tech<span>Pulse</span></a>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <a href="compare.html" class="nav-link" style="color:var(--cyan);display:flex;align-items:center;gap:6px"><i class="fa-solid fa-code-compare"></i> So sánh</a>
+                <div class="nav-categories" id="nav-categories"></div>
+            </nav>
+            <div class="header-actions">
+                <div class="search-wrap">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm..."
+                        onkeypress="if(event.key==='Enter') window.location.href='search.html?q='+encodeURIComponent(this.value)">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </div>
+                <div id="auth-buttons"></div>
+                <button class="hamburger" id="hamburger-btn" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="tp-container" style="padding-top:32px;padding-bottom:60px;min-height:70vh">
+        <div class="section-header" style="margin-bottom:28px">
+            <span class="section-label" style="color:#ef4444"><i class="fa-solid fa-heart"></i> <span style="color:#ef4444">Bài viết đã thích</span></span>
+            <div class="section-line"></div>
+        </div>
+        
+        <div class="posts-grid" id="posts-grid">
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+        </div>
+    </main>
+
+    <footer class="tp-footer">
+        <div class="tp-container footer-inner">
+            <div class="footer-brand">
+                <a class="logo footer-logo" href="index.html">Tech<span>Pulse</span></a>
+                <p>Nền tảng tin tức công nghệ đáng tin cậy tại Việt Nam.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 TechPulse. All rights reserved.</div>
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="common.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) {
+            window.location.href = 'auth.html';
+        }
+
+        // ── Auth area ──────────────────────────────
+        renderHeader('auth-buttons');
+
+        // ── Load posts ──────────────────────────────
+        async function loadLikedPosts() {
+            const grid = document.getElementById('posts-grid');
+            try {
+                const r = await api.get('/likes');
+                const posts = r.data || [];
+
+                if (!posts.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted)"><i class="fa-regular fa-heart" style="font-size:40px;margin-bottom:16px;display:block;opacity:.4"></i>Bạn chưa thích bài viết nào.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = posts.map(p => `
+                    <a href="post.html?slug=${p.slug}" class="post-card" style="text-decoration:none">
+                        <div class="post-card-img">
+                            <img src="${p.thumbnail || 'https://picsum.photos/seed/' + p.id + '/480/300'}" alt="${p.title}" loading="lazy" onerror="this.src='https://picsum.photos/seed/${p.id}/480/300'">
+                        </div>
+                        <div class="post-card-body">
+                            <span class="post-cat-badge">${p.categoryName || 'Khác'}</span>
+                            <h3 class="post-card-title">${p.title}</h3>
+                            <div class="post-card-meta">
+                                <span><i class="fa-regular fa-user"></i> ${p.authorName || 'Admin'}</span>
+                                <span><i class="fa-regular fa-calendar"></i> ${formatDate(p.createdAt)}</span>
+                                <span><i class="fa-regular fa-eye"></i> ${(p.views || 0).toLocaleString('vi-VN')}</span>
+                            </div>
+                        </div>
+                    </a>`).join('');
+
+            } catch (e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Lỗi tải dữ liệu.</div>`;
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const r = await api.get('/categories');
+                const cats = r.data || [];
+                document.getElementById('nav-categories').innerHTML = cats.slice(0, 5).map(c =>
+                    `<a href="category.html?slug=${c.slug}&name=${encodeURIComponent(c.name)}" class="nav-link">${c.name}</a>`
+                ).join('');
+            } catch (e) { }
+        }
+
+        loadLikedPosts();
+        loadCategories();
+    </script>
+</body>
+</html>

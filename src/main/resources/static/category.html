@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên mục - TechPulse</title>
+    <meta name="description" content="Xem bài viết theo chuyên mục tại TechPulse.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="tp-header" id="header">
+        <div class="tp-container header-inner">
+            <a href="index.html" class="logo">Tech<span>Pulse</span></a>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <a href="compare.html" class="nav-link" style="color:var(--cyan);display:flex;align-items:center;gap:6px"><i class="fa-solid fa-code-compare"></i> So sánh</a>
+                <div class="nav-categories" id="nav-categories"></div>
+            </nav>
+            <div class="header-actions">
+                <div class="search-wrap">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm..."
+                        onkeypress="if(event.key==='Enter') window.location.href='search.html?q='+encodeURIComponent(this.value)">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </div>
+                <div id="auth-buttons"></div>
+                <button class="hamburger" id="hamburger-btn" onclick="toggleMobileNav()"><i
+                        class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+        <!-- Mobile nav -->
+        <div class="mobile-nav" id="mobile-nav"
+            style="display:none;padding:12px 20px;border-top:1px solid var(--border)">
+            <a href="index.html"
+                style="display:block;padding:10px 0;color:var(--text-muted);font-size:14px;text-decoration:none;border-bottom:1px solid var(--border)">Trang
+                chủ</a>
+            <a href="search.html"
+                style="display:block;padding:10px 0;color:var(--text-muted);font-size:14px;text-decoration:none">Tìm
+                kiếm</a>
+        </div>
+    </header>
+
+    <main class="tp-container" style="padding-top:32px;padding-bottom:60px">
+        <!-- Breadcrumb -->
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:28px">
+            <a href="index.html" style="color:var(--text-muted);text-decoration:none;transition:color .2s"
+                onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--text-muted)'">Trang
+                chủ</a>
+            <i class="fa-solid fa-chevron-right" style="font-size:10px"></i>
+            <a href="#" style="color:var(--cyan);text-decoration:none" id="cat-breadcrumb">Chuyên mục</a>
+        </div>
+
+        <!-- Category header -->
+        <div class="section-header" style="margin-bottom:28px">
+            <span class="section-label"><i class="fa-solid fa-folder"></i> <span id="cat-page-title">Đang
+                    tải...</span></span>
+            <div class="section-line"></div>
+        </div>
+        <p id="cat-desc" style="font-size:14px;color:var(--text-muted);margin-bottom:28px"></p>
+
+        <div class="main-layout">
+            <div class="posts-area">
+                <div class="posts-grid" id="posts-grid">
+                    <div class="skeleton-card">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-img"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="sidebar-widget">
+                    <h4 class="widget-title">Chuyên mục</h4>
+                    <div class="category-list" id="sidebar-categories"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="tp-footer">
+        <div class="tp-container footer-inner">
+            <div class="footer-brand">
+                <a class="logo footer-logo" href="index.html">Tech<span>Pulse</span></a>
+                <p>Nền tảng tin tức công nghệ đáng tin cậy tại Việt Nam.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 TechPulse. All rights reserved.</div>
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="common.js"></script>
+    <script>
+        const params = new URLSearchParams(location.search);
+        const catSlug = params.get('slug');
+        const catName = params.get('name') || catSlug || 'Chuyên mục';
+        let currentPage = 0;
+        let totalPages = 1;
+
+        // ── Auth area ──────────────────────────────
+        renderHeader('auth-buttons');
+
+        // ── Mobile nav ──────────────────────────────
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobile-nav');
+            nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ── Set page title ──────────────────────────
+        document.getElementById('cat-page-title').textContent = catName;
+        document.getElementById('cat-breadcrumb').textContent = catName;
+        document.title = catName + ' - TechPulse';
+
+        // ── Load posts ──────────────────────────────
+        async function loadPosts(page = 0) {
+            currentPage = page;
+            const grid = document.getElementById('posts-grid');
+            grid.innerHTML = `
+                <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>`;
+            try {
+                const path = catSlug
+                    ? `/posts?categorySlug=${encodeURIComponent(catSlug)}&page=${page}&size=9`
+                    : `/posts?page=${page}&size=9`;
+                const r = await api.get(path);
+                const posts = r.data?.content || [];
+                totalPages = r.data?.totalPages || 1;
+
+                if (!posts.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted)"><i class="fa-solid fa-folder-open" style="font-size:40px;margin-bottom:16px;display:block;opacity:.4"></i>Chưa có bài viết nào trong chuyên mục này.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = posts.map(p => `
+                    <a href="post.html?slug=${p.slug}" class="post-card" style="text-decoration:none">
+                        <div class="post-card-img">
+                            <img src="${p.thumbnail || 'https://picsum.photos/seed/' + p.id + '/480/300'}" alt="${p.title}" loading="lazy" onerror="this.src='https://picsum.photos/seed/${p.id}/480/300'">
+                        </div>
+                        <div class="post-card-body">
+                            <span class="post-cat-badge">${p.categoryName || catName}</span>
+                            <h3 class="post-card-title">${p.title}</h3>
+                            <div class="post-card-meta">
+                                <span><i class="fa-regular fa-user"></i> ${p.authorName || 'Admin'}</span>
+                                <span><i class="fa-regular fa-calendar"></i> ${formatDate(p.createdAt)}</span>
+                                <span><i class="fa-regular fa-eye"></i> ${(p.views || 0).toLocaleString('vi-VN')}</span>
+                            </div>
+                        </div>
+                    </a>`).join('');
+
+                renderPagination();
+            } catch (e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Lỗi tải bài viết.</div>`;
+            }
+        }
+
+        function renderPagination() {
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 0; i < Math.min(totalPages, 8); i++) {
+                html += `<button class="page-btn${i === currentPage ? ' active' : ''}" onclick="loadPosts(${i})">${i + 1}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        // ── Sidebar categories ──────────────────────
+        async function loadSidebarCats() {
+            try {
+                const r = await api.get('/categories');
+                const cats = r.data || [];
+                document.getElementById('sidebar-categories').innerHTML = cats.map(c =>
+                    `<a href="category.html?slug=${c.slug}&name=${encodeURIComponent(c.name)}"
+                        class="cat-item${c.slug === catSlug ? ' active' : ''}">${c.name}</a>`
+                ).join('');
+                // Also populate nav
+                document.getElementById('nav-categories').innerHTML = cats.slice(0, 5).map(c =>
+                    `<a href="category.html?slug=${c.slug}&name=${encodeURIComponent(c.name)}" class="nav-link">${c.name}</a>`
+                ).join('');
+            } catch (e) { }
+        }
+
+        loadPosts(0);
+        loadSidebarCats();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm kiếm - TechPulse</title>
+    <meta name="description" content="Tìm kiếm bài viết công nghệ tại TechPulse.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .search-hero {
+            background: linear-gradient(135deg, rgba(14, 116, 144, .15) 0%, rgba(168, 85, 247, .08) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 48px 0 40px;
+            text-align: center;
+        }
+
+        .search-big-input {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-big-input input {
+            width: 100%;
+            padding: 16px 56px 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search-big-input input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, .1);
+        }
+
+        .search-big-input button {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--cyan);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: #000;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity .2s;
+        }
+
+        .search-big-input button:hover {
+            opacity: .85;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="tp-header">
+        <div class="tp-container header-inner">
+            <a href="index.html" class="logo">Tech<span>Pulse</span></a>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <div class="nav-categories" id="nav-categories"></div>
+            </nav>
+            <div class="header-actions">
+                <div id="auth-buttons"></div>
+                <button class="hamburger" onclick="toggleMobileNav()"><i class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+        <div class="mobile-nav" id="mobile-nav"
+            style="display:none;padding:12px 20px;border-top:1px solid var(--border)">
+            <a href="index.html"
+                style="display:block;padding:10px 0;color:var(--text-muted);font-size:14px;text-decoration:none">Trang
+                chủ</a>
+        </div>
+    </header>
+
+    <!-- Search hero -->
+    <section class="search-hero">
+        <h1 class="outfit" style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:#fff;margin-bottom:20px">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--cyan);margin-right:10px"></i>Tìm kiếm
+        </h1>
+        <div class="search-big-input tp-container">
+            <input type="text" id="search-input" placeholder="Nhập từ khóa tìm kiếm..." autocomplete="off">
+            <button onclick="doSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <p id="search-summary" style="margin-top:16px;font-size:13px;color:var(--text-muted)"></p>
+    </section>
+
+    <main class="tp-container" style="padding-top:36px;padding-bottom:60px">
+        <div class="main-layout">
+            <div class="posts-area">
+                <div class="posts-grid" id="posts-grid">
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted)">
+                        <i class="fa-solid fa-magnifying-glass"
+                            style="font-size:40px;opacity:.3;display:block;margin-bottom:12px"></i>
+                        Nhập từ khóa để tìm kiếm bài viết.
+                    </div>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="sidebar-widget">
+                    <h4 class="widget-title">Chuyên mục</h4>
+                    <div class="category-list" id="sidebar-categories"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="tp-footer">
+        <div class="tp-container footer-inner">
+            <div class="footer-brand">
+                <a class="logo footer-logo" href="index.html">Tech<span>Pulse</span></a>
+                <p>Nền tảng tin tức công nghệ đáng tin cậy tại Việt Nam.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 TechPulse. All rights reserved.</div>
+    </footer>
+
+    <script src="common.js"></script>
+    <script>
+        let currentPage = 0, totalPages = 1, currentQuery = '';
+        let debounceTimer = null;
+
+        // Read query from URL
+        const urlParams = new URLSearchParams(location.search);
+        const initialQ = urlParams.get('q') || '';
+        if (initialQ) {
+            document.getElementById('search-input').value = initialQ;
+            currentQuery = initialQ;
+        }
+        document.title = initialQ ? `"${initialQ}" - Tìm kiếm - TechPulse` : 'Tìm kiếm - TechPulse';
+
+        // ── Auth area ──────────────────────────────
+        renderHeader('auth-buttons');
+
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobile-nav');
+            nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // ── Search ──────────────────────────────────
+        document.getElementById('search-input').addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                currentQuery = this.value.trim();
+                if (currentQuery.length >= 2) doSearch(0);
+            }, 380);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') doSearch(0);
+        });
+
+        async function doSearch(page = 0) {
+            const q = document.getElementById('search-input').value.trim() || currentQuery;
+            currentQuery = q;
+            currentPage = page;
+
+            // Update URL without reload
+            const newUrl = location.pathname + '?q=' + encodeURIComponent(q);
+            history.replaceState(null, '', newUrl);
+            document.title = q ? `"${q}" - Tìm kiếm - TechPulse` : 'Tìm kiếm - TechPulse';
+
+            if (!q) {
+                document.getElementById('posts-grid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted)"><i class="fa-solid fa-magnifying-glass" style="font-size:40px;opacity:.3;display:block;margin-bottom:12px"></i>Nhập từ khóa để tìm kiếm.</div>`;
+                document.getElementById('search-summary').textContent = '';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            const grid = document.getElementById('posts-grid');
+            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block;color:var(--cyan)"></i>Đang tìm kiếm...</div>`;
+            document.getElementById('search-summary').textContent = '';
+
+            try {
+                const r = await api.get(`/posts?keyword=${encodeURIComponent(q)}&page=${page}&size=9`);
+                const posts = r.data?.content || [];
+                totalPages = r.data?.totalPages || 1;
+                const total = r.data?.totalElements || posts.length;
+
+                document.getElementById('search-summary').textContent =
+                    total > 0 ? `Tìm thấy ${total} kết quả cho "${q}"` : `Không tìm thấy kết quả cho "${q}"`;
+
+                if (!posts.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted)"><i class="fa-solid fa-search" style="font-size:40px;opacity:.3;display:block;margin-bottom:16px"></i>Không có kết quả phù hợp.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = posts.map(p => `
+                    <a href="post.html?slug=${p.slug}" class="post-card" style="text-decoration:none">
+                        <div class="post-card-img">
+                            <img src="${p.thumbnail || 'https://picsum.photos/seed/' + p.id + '/480/300'}" alt="${p.title}" loading="lazy" onerror="this.src='https://picsum.photos/seed/${p.id}/480/300'">
+                        </div>
+                        <div class="post-card-body">
+                            <span class="post-cat-badge">${p.categoryName || 'Khác'}</span>
+                            <h3 class="post-card-title">${p.title}</h3>
+                            <div class="post-card-meta">
+                                <span><i class="fa-regular fa-user"></i> ${p.authorName || 'Admin'}</span>
+                                <span><i class="fa-regular fa-calendar"></i> ${formatDate(p.createdAt)}</span>
+                            </div>
+                        </div>
+                    </a>`).join('');
+
+                renderPagination();
+            } catch (e) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Lỗi tìm kiếm.</div>`;
+            }
+        }
+
+        function renderPagination() {
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 0; i < Math.min(totalPages, 8); i++) {
+                html += `<button class="page-btn${i === currentPage ? ' active' : ''}" onclick="doSearch(${i})">${i + 1}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        // ── Sidebar ─────────────────────────────────
+        async function loadSidebar() {
+            try {
+                const r = await api.get('/categories');
+                const cats = r.data || [];
+                document.getElementById('sidebar-categories').innerHTML = cats.map(c =>
+                    `<a href="category.html?slug=${c.slug}&name=${encodeURIComponent(c.name)}" class="cat-item">${c.name}</a>`
+                ).join('');
+                document.getElementById('nav-categories').innerHTML = cats.slice(0, 5).map(c =>
+                    `<a href="category.html?slug=${c.slug}&name=${encodeURIComponent(c.name)}" class="nav-link">${c.name}</a>`
+                ).join('');
+            } catch (e) { }
+        }
+
+        loadSidebar();
+        if (initialQ) doSearch(0);
+    </script>
+</body>
+
+</html>

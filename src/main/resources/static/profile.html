@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - TechPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-hero {
+            background: linear-gradient(135deg, rgba(34, 211, 238, .1) 0%, rgba(168, 85, 247, .05) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .avatar-edit-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--surface);
+            box-shadow: 0 0 25px var(--cyan-glow);
+            object-fit: cover;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: var(--cyan);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid var(--surface);
+            transition: all 0.2s;
+        }
+
+        .avatar-edit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--cyan);
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 800px;
+            margin: -60px auto 60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .profile-input {
+            width: 100%;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .profile-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan-glow);
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="tp-header">
+        <div class="tp-container header-inner">
+            <a href="index.html" class="logo">Tech<span>Pulse</span></a>
+            <div class="header-actions">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <div id="auth-buttons"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="profile-hero"></div>
+
+    <main class="tp-container">
+        <div class="profile-card">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div class="avatar-edit-wrap">
+                    <img id="p-avatar" src="https://ui-avatars.com/api/?name=User&background=0e7490&color=fff"
+                        class="profile-avatar" alt="Avatar">
+                    <label class="avatar-edit-btn" title="Thay đổi ảnh đại diện">
+                        <i class="fa-solid fa-camera"></i>
+                        <input type="file" id="avatar-input" style="display: none;" accept="image/*"
+                            onchange="handleAvatarUpload(this)">
+                    </label>
+                </div>
+                <h1 id="p-display-name" class="outfit" style="font-size: 28px; font-weight: 800; color: #fff;">Đang tải...
+                </h1>
+                <p id="p-display-role"
+                    style="color: var(--cyan); font-size: 12px; font-weight: 700; text-transform: uppercase; margin-top: 4px;">
+                    USER</p>
+            </div>
+
+            <form id="profile-form" onsubmit="saveProfile(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                    <div class="form-group">
+                        <label>Tên đăng nhập (Khóa)</label>
+                        <input type="text" id="p-username" class="profile-input" readonly
+                            style="opacity: 0.6; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="p-email" class="profile-input" placeholder="example@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="p-fullname" class="profile-input" placeholder="Nguyễn Văn A">
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" id="p-phone" class="profile-input" placeholder="0123 456 789">
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày sinh</label>
+                        <input type="date" id="p-dob" class="profile-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Giới tính</label>
+                        <select id="p-gender" class="profile-input">
+                            <option value="">Chọn giới tính</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Địa chỉ</label>
+                        <input type="text" id="p-address" class="profile-input" placeholder="Thành phố, Quận/Huyện...">
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Link ảnh đại diện (Nếu không tải lên file)</label>
+                        <input type="text" id="p-avatar-url" class="profile-input" placeholder="https://..."
+                            oninput="document.getElementById('p-avatar').src=this.value">
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; display: flex; justify-content: center;">
+                    <button type="submit" class="tp-btn" style="min-width: 200px;">
+                        <i class="fa-solid fa-save" style="margin-right: 8px;"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script src="common.js"></script>
+    <script>
+        if (!Auth.isLoggedIn()) { window.location.href = 'auth.html'; }
+        renderHeader('auth-buttons');
+
+        async function loadProfile() {
+            try {
+                const r = await api.get('/users/me');
+                if (r.success && r.data) {
+                    const u = r.data;
+                    document.getElementById('p-username').value = u.username || '';
+                    document.getElementById('p-email').value = u.email || '';
+                    document.getElementById('p-fullname').value = u.fullName || '';
+                    document.getElementById('p-phone').value = u.phone || '';
+                    document.getElementById('p-address').value = u.address || '';
+                    document.getElementById('p-dob').value = u.dateOfBirth || '';
+                    document.getElementById('p-gender').value = u.gender || '';
+                    document.getElementById('p-avatar-url').value = u.avatar || '';
+
+                    document.getElementById('p-display-name').textContent = u.fullName || u.username;
+                    document.getElementById('p-display-role').textContent = u.role;
+
+                    if (u.avatar) {
+                        document.getElementById('p-avatar').src = getImgUrl(u.avatar);
+                    } else {
+                        document.getElementById('p-avatar').src = `https://ui-avatars.com/api/?name=${u.fullName || u.username}&background=0e7490&color=fff`;
+                    }
+                }
+            } catch (e) {
+                showToast('Không thể tải thông tin hồ sơ', 'error');
+            }
+        }
+
+        async function handleAvatarUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            showToast('Đang tải ảnh lên...', 'info');
+            try {
+                const r = await api.upload(file);
+                if (r.success && r.data) {
+                    document.getElementById('p-avatar-url').value = r.data;
+                    document.getElementById('p-avatar').src = getImgUrl(r.data);
+                    showToast('Tải ảnh thành công!');
+                }
+            } catch (e) {
+                showToast('Lỗi tải ảnh', 'error');
+            }
+        }
+
+        async function saveProfile(e) {
+            e.preventDefault();
+            const data = {
+                fullName: document.getElementById('p-fullname').value.trim(),
+                email: document.getElementById('p-email').value.trim(),
+                phone: document.getElementById('p-phone').value.trim(),
+                address: document.getElementById('p-address').value.trim(),
+                dateOfBirth: document.getElementById('p-dob').value,
+                gender: document.getElementById('p-gender').value,
+                avatar: document.getElementById('p-avatar-url').value.trim()
+            };
+
+            try {
+                const r = await api.put('/users/me', data);
+                if (r.success) {
+                    showToast('Cập nhật hồ sơ thành công!');
+                    // Update localStorage user object to reflect changes immediately in header/other pages
+                    const oldUser = Auth.getUser();
+                    const newUser = { ...oldUser, fullName: data.fullName, avatar: data.avatar };
+                    localStorage.setItem('tp_user', JSON.stringify(newUser));
+
+                    // Refresh display
+                    document.getElementById('p-display-name').textContent = data.fullName || oldUser.username;
+                    if (data.avatar) document.getElementById('p-avatar').src = getImgUrl(data.avatar);
+
+                    // Small delay then reload to sync everything
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(r.message || 'Lỗi cập nhật', 'error');
+                }
+            } catch (e) {
+                showToast('Lỗi kết nối server', 'error');
+            }
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

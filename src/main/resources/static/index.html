@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechPulse - Tin tức Công nghệ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="tp-header" id="header">
+        <div class="tp-container header-inner">
+            <a href="index.html" class="logo">Tech<span>Pulse</span></a>
+            <nav class="main-nav" id="main-nav">
+                <a href="index.html" class="nav-link active">Trang chủ</a>
+                <a href="compare.html" class="nav-link"
+                    style="color:var(--cyan);display:flex;align-items:center;gap:6px"><i
+                        class="fa-solid fa-code-compare"></i> So sánh</a>
+                <div class="nav-categories" id="nav-categories"></div>
+            </nav>
+            <div class="header-actions">
+                <button onclick="toggleTheme()" class="theme-toggle-btn" title="Đổi giao diện">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+                <div class="search-wrap">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm..."
+                        onkeypress="if(event.key==='Enter') window.location.href='search.html?q='+encodeURIComponent(this.value)">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </div>
+                <div id="auth-buttons"></div>
+                <button class="hamburger" id="hamburger-btn" onclick="toggleMobileNav()"><i
+                        class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+        <!-- Mobile nav -->
+        <div class="mobile-nav" id="mobile-nav"
+            style="display:none;padding:12px 20px;border-top:1px solid var(--border)">
+        </div>
+
+        <!-- Marquee -->
+        <div class="marquee-container">
+            <div class="marquee-label">Tin mới</div>
+            <div class="marquee-content-wrap">
+                <div class="marquee-content" id="marquee-content">
+                    Đang tải tin tức...
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-section" id="hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="tp-container hero-content">
+            <div class="hero-badge"><span class="badge-dot"></span> ✨ BÀI VIẾT MỚI NHẤT</div>
+            <h1 class="hero-title" id="hero-title">Đang tải...</h1>
+            <p class="hero-excerpt" id="hero-excerpt"></p>
+            <div class="hero-meta">
+                <img id="hero-avatar" src="https://picsum.photos/id/64/80/80" class="hero-avatar" alt="">
+                <div>
+                    <p id="hero-author" class="hero-author-name"></p>
+                    <p id="hero-date" class="hero-date"></p>
+                </div>
+            </div>
+            <a id="hero-link" href="#" class="btn-primary">Đọc ngay <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <main class="tp-container main-layout">
+        <div class="posts-area">
+            <div class="section-header">
+                <span class="section-label"><i class="fa-solid fa-fire"></i> Tin nóng</span>
+                <div class="section-line"></div>
+            </div>
+            <div class="posts-grid" id="posts-grid">
+                <div class="skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                </div>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="sidebar-widget">
+                <h4 class="widget-title">Chuyên mục</h4>
+                <div class="category-list" id="sidebar-categories"></div>
+            </div>
+            <div class="sidebar-widget">
+                <h4 class="widget-title"><i class="fa-solid fa-arrow-trend-up"></i> Đọc nhiều</h4>
+                <div class="trending-list" id="trending-list"></div>
+            </div>
+            <div class="sidebar-widget">
+                <h4 class="widget-title"><i class="fa-solid fa-heart" style="color:#ef4444"></i> Được yêu thích nhất</h4>
+                <div class="trending-list" id="loved-list">
+                    <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Đang tải...</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="tp-footer">
+        <div class="tp-container footer-inner">
+            <div class="footer-brand">
+                <a class="logo footer-logo" href="index.html">Tech<span>Pulse</span></a>
+                <p>Nền tảng tin tức công nghệ đáng tin cậy tại Việt Nam.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <div>
+                    <h5>Chuyên mục</h5>
+                    <ul id="footer-categories"></ul>
+                </div>
+                <div>
+                    <h5>TechPulse</h5>
+                    <ul>
+                        <li><a href="#">Về chúng tôi</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 TechPulse. All rights reserved.</div>
+    </footer>
+
+    <div id="toast-container"></div>
+    <script src="common.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

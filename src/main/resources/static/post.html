@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechPulse - Bài viết</title>
+    <meta name="description" content="">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        .hero-banner {
+            position: relative;
+            min-height: 550px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-banner img.bg-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) blur(10px);
+            transform: scale(1.1);
+            z-index: 0;
+            transition: filter 0.3s ease;
+        }
+
+        .light-mode .hero-banner img.bg-image {
+            filter: brightness(1) blur(10px) opacity(0.15);
+        }
+
+        .hero-banner .ov {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg) 100%), linear-gradient(to top, var(--bg) 0%, transparent 60%);
+            z-index: 1;
+        }
+
+        .hero-banner .hc {
+            position: relative;
+            z-index: 5;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            align-items: center;
+            padding: 80px 24px 40px;
+        }
+
+        @media (min-width: 1024px) {
+            .hero-banner .hc {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .hero-featured-img-wrap {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+        }
+
+        .hero-featured-img-wrap img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+            display: block;
+        }
+
+        .article-body {
+            font-size: 18px;
+            line-height: 1.9;
+            color: var(--text) !important;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .article-body>p:first-of-type::first-letter {
+            float: left;
+            font-size: 4.5rem;
+            line-height: 0.8;
+            margin: 0.1em 0.15em 0 0;
+            color: var(--cyan);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 800;
+            text-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        .article-body h2,
+        .article-body h3 {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 800;
+            color: var(--text);
+            margin: 48px 0 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .article-body h2 {
+            font-size: 28px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .article-body h3 {
+            font-size: 22px;
+        }
+
+        .article-body p {
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .article-body img {
+            width: 100%;
+            border-radius: 20px;
+            margin: 32px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .article-body blockquote {
+            border-left: 4px solid var(--cyan);
+            padding: 24px 32px;
+            margin: 40px 0;
+            background: linear-gradient(90deg, rgba(34, 211, 238, .08) 0%, transparent 100%);
+            border-radius: 0 20px 20px 0;
+            color: var(--text);
+            font-style: italic;
+            font-size: 20px;
+            position: relative;
+        }
+
+        .article-body blockquote::before {
+            content: "\201C";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 60px;
+            color: var(--cyan);
+            opacity: 0.2;
+            font-family: serif;
+        }
+
+        .article-body ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .article-body ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--cyan);
+            font-size: 24px;
+            line-height: 1;
+            top: -2px;
+        }
+
+        .article-body code {
+            background: rgba(34, 211, 238, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+
+        .article-body pre {
+            background: #111113;
+            padding: 24px;
+            border-radius: 16px;
+            overflow-x: auto;
+            margin: 32px 0;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        }
+
+        .article-body pre code {
+            background: none;
+            padding: 0;
+            border: none;
+            color: #e4e4e7;
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .like-btn:hover,
+        .like-btn.liked {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, .1);
+            color: #ef4444;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, .2);
+            transform: translateY(-2px);
+        }
+
+        #save-btn:hover,
+        #save-btn.liked {
+            border-color: var(--cyan);
+            background: rgba(34, 211, 238, .1);
+            color: var(--cyan);
+            box-shadow: 0 8px 20px rgba(34, 211, 238, .2);
+        }
+
+        .like-btn.liked i {
+            animation: heartPulse 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes heartPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .share-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(34, 211, 238, .05);
+            transform: translateY(-2px);
+        }
+
+        #scroll-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyan), #3b82f6);
+            z-index: 1001;
+            width: 0;
+            transition: width .15s ease-out;
+            box-shadow: 0 0 15px var(--cyan);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .cmt-item {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toc-item {
+            font-size: 14px;
+            padding: 8px 0 8px 16px;
+            border-left: 2px solid var(--border);
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all .2s;
+            margin-bottom: 4px;
+        }
+
+        .toc-item:hover,
+        .toc-item.active {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: linear-gradient(90deg, rgba(34, 211, 238, .05) 0%, transparent 100%);
+        }
+
+        /* Progress Modal */
+        .progress-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .progress-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .progress-modal-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-modal-overlay.active .progress-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        /* Author card floating */
+        .author-card-float {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 16px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .author-card-float {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="scroll-bar"></div>
+
+    <header class="tp-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+            <a href="index.html" class="syne text-2xl font-bold"><span style="color:var(--cyan)">Tech</span><span
+                    style="color:var(--text)">Pulse</span></a>
+            <div style="display:flex;align-items:center;gap:16px">
+                <button onclick="history.back()"
+                    style="font-size:13px;color:var(--text-muted);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .2s;font-family:'Be Vietnam Pro',sans-serif"
+                    onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <i class="fa-solid fa-arrow-left"></i> Quay lai
+                </button>
+                <div id="auth-area"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero-banner">
+        <img id="post-thumb-bg" class="bg-image" src="https://picsum.photos/id/1015/1920/800" alt="">
+        <div class="ov"></div>
+        <div class="hc max-w-7xl mx-auto w-full">
+            <div class="hero-text-content" style="animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
+                <span id="post-cat"
+                    style="display:inline-block;padding:6px 16px;font-size:11px;font-weight:800;letter-spacing:1px;border-radius:99px;background:rgba(34,211,238,.15);color:var(--cyan);margin-bottom:20px;text-transform:uppercase;width:fit-content;border:1px solid rgba(34,211,238,.3);box-shadow:0 0 15px var(--cyan-glow)"></span>
+                <h1 id="post-title" class="outfit"
+                    style="font-size:clamp(2rem,4.5vw,3.5rem);font-weight:800;line-height:1.15;color:var(--text);margin-bottom:24px;letter-spacing:-1px">
+                </h1>
+                <div class="author-card-float">
+                    <img id="post-avatar" src="https://picsum.photos/id/64/40/40"
+                        style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--cyan)"
+                        alt="">
+                    <div style="flex:1">
+                        <p id="post-author" style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">
+                        </p>
+                        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-muted)">
+                            <span><i class="fa-regular fa-calendar" style="margin-right:4px"></i><span
+                                    id="post-date"></span></span>
+                            <span style="width:4px;height:4px;border-radius:50%;background:var(--border)"></span>
+                            <span><i class="fa-regular fa-eye" style="margin-right:4px"></i><span
+                                    id="post-views">0</span> lượt xem</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-featured-img-wrap">
+                <img id="post-thumb" src="https://picsum.photos/id/1015/1920/800" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <article class="lg:col-span-8">
+                <div id="post-body" class="article-body">
+                    <div class="skeleton" style="height:18px;margin-bottom:12px"></div>
+                    <div class="skeleton" style="height:18px;width:85%;margin-bottom:12px"></div>
+                    <div class="skeleton" style="height:18px;margin-bottom:24px"></div>
+                    <div class="skeleton" style="height:220px;margin:20px 0;border-radius:16px"></div>
+                    <div class="skeleton" style="height:18px;margin-bottom:12px"></div>
+                    <div class="skeleton" style="height:18px;width:72%;margin-bottom:12px"></div>
+                </div>
+
+                <!-- Actions -->
+                <div
+                    style="display:flex;align-items:center;justify-content:space-between;margin-top:32px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+                    <div style="display:flex;gap:12px">
+                        <button class="like-btn" id="like-btn" onclick="toggleLike()">
+                            <i class="fa-regular fa-heart"></i> Thích
+                        </button>
+                        <button class="like-btn" id="save-btn" onclick="toggleSavePost()">
+                            <i class="fa-regular fa-bookmark"></i> Lưu bài viết
+                        </button>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                        <button class="share-btn"
+                            onclick="navigator.clipboard.writeText(location.href);showToast('Da copy link!')"
+                            title="Copy link"><i class="fa-solid fa-link" style="font-size:11px"></i></button>
+                        <button class="share-btn"
+                            onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href))"><i
+                                class="fa-brands fa-facebook-f" style="font-size:11px"></i></button>
+                        <button class="share-btn"
+                            onclick="window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href))"><i
+                                class="fa-brands fa-x-twitter" style="font-size:11px"></i></button>
+                    </div>
+                </div>
+
+                <!-- Comments -->
+                <div style="margin-top:40px">
+                    <h3 class="outfit"
+                        style="font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px">
+                        <i class="fa-regular fa-comments" style="color:var(--cyan)"></i>
+                        Binh luan (<span id="cmt-count">0</span>)
+                    </h3>
+                    <div id="cmt-form-area" style="margin-bottom:20px"></div>
+                    <div id="cmt-list"></div>
+                </div>
+            </article>
+
+            <aside class="lg:col-span-4"
+                style="position:sticky;top:80px;align-self:flex-start;display:flex;flex-direction:column;gap:24px">
+                <div class="card rounded-3xl p-6" id="toc-box" style="display:none">
+                    <h4 class="outfit"
+                        style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">
+                        Noi dung</h4>
+                    <div id="toc-list"></div>
+                </div>
+                <div class="card rounded-3xl p-6">
+                    <h4 class="outfit"
+                        style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+                        <i class="fa-solid fa-layer-group" style="color:var(--cyan)"></i> Bai viet khac
+                    </h4>
+                    <div id="related-list" style="display:flex;flex-direction:column;gap:16px"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer style="border-top:1px solid var(--border);padding:40px 0;text-align:center;background:var(--surface)">
+        <a href="index.html" class="logo outfit"
+            style="font-size:24px;font-weight:800;text-decoration:none"><span>Tech</span>Pulse</a>
+        <p style="font-size:14px;color:var(--text-muted);margin-top:12px">2026 TechPulse. All rights reserved.</p>
+    </footer>
+
+    <!-- Reading Progress Modal -->
+    <div id="progress-modal" class="progress-modal-overlay">
+        <div class="progress-modal-content card rounded-3xl p-8">
+            <div class="modal-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+            <h3 class="outfit"
+                style="font-size: 24px; font-weight: 800; margin-bottom: 12px; color: #fff; letter-spacing: -0.5px;">
+                Tiếp tục đọc?</h3>
+            <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6;">
+                Bạn đang đọc dở bài viết này lần trước. Bạn có muốn tiếp tục từ vị trí đã lưu không?
+            </p>
+            <div style="display: flex; gap: 16px;">
+                <button id="btn-continue-read" class="tp-btn" style="flex: 1;"><i class="fa-solid fa-play"
+                        style="margin-right: 8px;"></i> Đọc tiếp</button>
+                <button id="btn-restart-read" class="tp-btn-ghost" style="flex: 1;">Đọc từ đầu</button>
+            </div>
+            <button onclick="closeProgressModal()"
+                style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; transition: color 0.2s;"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'"><i
+                    class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="post.js"></script>
+</body>
+
+</html>
